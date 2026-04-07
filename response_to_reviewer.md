@@ -1,31 +1,26 @@
-$\def \Rb {\mathbb{R}}$
-$\def \Eb {\mathbb{E}}$
-$\def \tr  {\mathrm{true}}$
-$\def \tn {\mathrm{noise}}$
-
 Dear AC,
 
 Thanks for your time and consideration. Since the Reviewer yaeN was added after the rebuttal period, we did not have an opportunity to respond in the public discussion. We would therefore be very grateful if you could kindly forward the following response to the review on our behalf.
 
 ## On theoretical analysis of AGOP in MIPL
 
-The key difficulty in MIPL is not only candidate-label ambiguity, but also that the true bag label is usually supported by only a small subset of key instances, while many irrelevant instances remain in the bag. AGOP helps because it does not directly denoise labels, instead, it reshapes the feature geometry according to the sensitivity of the bag-level predictor. Concretely, we compute AGOP on the bag-level representation $z \in \Rb^{d'}$:
+The key difficulty in MIPL is not only candidate-label ambiguity, but also that the true bag label is usually supported by only a small subset of key instances, while many irrelevant instances remain in the bag. AGOP helps because it does not directly denoise labels; instead, it reshapes the feature geometry according to the sensitivity of the bag-level predictor. Concretely, we compute AGOP on the bag-level representation $z \in \mathbb{R}^{d'}$:
 $$
-G = \Eb\left[J_f(z)^\top J_f(z)\right],
+G = \mathbb{E}\left[J_f(z)^\top J_f(z)\right],
 $$
 where $J_f(z)$ is the Jacobian of the bag-level predictor with respect to $z$. Thus, AGOP emphasizes directions in representation space along which the predictor is consistently sensitive across training bags.
 
 A useful stylized interpretation is to decompose the bag-level gradient into a task-relevant part and a noise-induced part:
-$$g = g_{\tr} + g_{\tn}.$$
+$$g = g_{\mathrm{true}} + g_{\mathrm{noise}}.$$
 If
 $$
-\Eb[g_{\tr} g_{\tr}^\top] = U \Lambda U^\top,\quad
-\Eb[g_{\tn} g_{\tn}^\top] = \sigma^2 I,\quad
-\Eb[g_{\tr} g_{\tn}^\top] = 0,
+\mathbb{E}[g_{\mathrm{true}} g_{\mathrm{true}}^\top] = U \Lambda U^\top,\quad
+\mathbb{E}[g_{\mathrm{noise}} g_{\mathrm{noise}}^\top] = \sigma^2 I,\quad
+\mathbb{E}[g_{\mathrm{true}} g_{\mathrm{noise}}^\top] = 0,
 $$
-Where $g_{\tr}$ denotes the component aligned with the true-label / key-instance signal, while $g_{\tn}$ denotes the component induced by false-positive candidate labels and irrelevant instances. Then
+where $g_{\mathrm{true}}$ denotes the component aligned with the true-label / key-instance signal, while $g_{\mathrm{noise}}$ denotes the component induced by false-positive candidate labels and irrelevant instances. Then
 $$
-G=\Eb[g g^\top] = U\Lambda U^\top + \sigma^2 I.
+G=\mathbb{E}[g g^\top] = U\Lambda U^\top + \sigma^2 I.
 $$
 Hence the top-$r$ eigenspace of AGOP is exactly the discriminative subspace $U$. Moreover, if $x=x_U+x_\perp$ with $x_U\in U$ and $x_\perp\in U^\perp$, then after the AGOP transform $G^{1/2}$,
 $$
@@ -38,7 +33,7 @@ This provides a mechanism for why AGOP is useful in noisy MIPL: directions relat
 
 ## On the scalability of our method
 
-In our implementation, AGOP is computed on the **bag-level representation** $z\in\mathbb{R}^{d'}$, the practical overhead is governed mainly by $d'$, the number of training bags, and the AGOP update frequency.
+In our implementation, AGOP is computed on the **bag-level representation** $z\in\mathbb{R}^{d'}$; the practical overhead is governed mainly by $d'$, the number of training bags, and the AGOP update frequency.
 
 We first profiled scalability with respect to dataset size at fixed $d'=128$:
 
@@ -68,4 +63,4 @@ Regarding transformer encoders, prior AGOP work is not restricted to CNN/MLP arc
 | Default encoder | SIVAL-MIPL ($r=3$) | 750 | 128 | 0.680 | 546.60 | 1.36 | 0.25% | 23.76 |
 | Lightweight Transformer | SIVAL-MIPL ($r=3$) | 750 | 128 | 0.651 | 3376.44 | 7.60 | 0.23% | 29.81 |
 
-Overall, these new results shows that AGOP is particularly useful in noisy MIPL because it amplifies stable discriminative directions before attention aggregation, and AGOP-specific overhead remains small even as dataset size and $d'$ increase. Moreover, our method is feasible for transformer-based encoders.
+Overall, these new results show that AGOP is particularly useful in noisy MIPL because it amplifies stable discriminative directions before attention aggregation, and AGOP-specific overhead remains small even as dataset size and $d'$ increase. Moreover, our method is feasible for transformer-based encoders.
