@@ -5,30 +5,37 @@ Thanks for your time and consideration. Since the Reviewer yaeN was added after 
 ## On theoretical analysis of AGOP in MIPL
 
 The key difficulty in MIPL is not only candidate-label ambiguity, but also that the true bag label is usually supported by only a small subset of key instances, while many irrelevant instances remain in the bag. AGOP helps because it does not directly denoise labels; instead, it reshapes the feature geometry according to the sensitivity of the bag-level predictor. Concretely, we compute AGOP on the bag-level representation $z \in \mathbb{R}^{d'}$:
-$$
+
+```math
 G = \mathbb{E}\left[J_f(z)^\top J_f(z)\right],
-$$
+```
 where $J_f(z)$ is the Jacobian of the bag-level predictor with respect to $z$. Thus, AGOP emphasizes directions in representation space along which the predictor is consistently sensitive across training bags.
 
 A useful stylized interpretation is to decompose the bag-level gradient into a task-relevant part and a noise-induced part:
-$$g = g_{\mathrm{true}} + g_{\mathrm{noise}}.$$
+
+```math
+g = g_{\mathrm{true}} + g_{\mathrm{noise}}.
+```
 If
-$$
+
+```math
 \mathbb{E}[g_{\mathrm{true}} g_{\mathrm{true}}^\top] = U \Lambda U^\top,\quad
 \mathbb{E}[g_{\mathrm{noise}} g_{\mathrm{noise}}^\top] = \sigma^2 I,\quad
 \mathbb{E}[g_{\mathrm{true}} g_{\mathrm{noise}}^\top] = 0,
-$$
+```
 where $g_{\mathrm{true}}$ denotes the component aligned with the true-label / key-instance signal, while $g_{\mathrm{noise}}$ denotes the component induced by false-positive candidate labels and irrelevant instances. Then
-$$
+
+```math
 G=\mathbb{E}[g g^\top] = U\Lambda U^\top + \sigma^2 I.
-$$
+```
 Hence the top-$r$ eigenspace of AGOP is exactly the discriminative subspace $U$. Moreover, if $x=x_U+x_\perp$ with $x_U\in U$ and $x_\perp\in U^\perp$, then after the AGOP transform $G^{1/2}$,
-$$
+
+```math
 \frac{\|G^{1/2}x_U\|}{\|G^{1/2}x_\perp\|}
 \ge
 \sqrt{1+\frac{\lambda_r}{\sigma^2}}
 \frac{\|x_U\|}{\|x_\perp\|}.
-$$
+```
 This provides a mechanism for why AGOP is useful in noisy MIPL: directions related to the true label are more coherent across bags, whereas false-positive-label directions are less consistent, so AGOP improves key-instance separation before attention aggregation.
 
 ## On the scalability of our method
